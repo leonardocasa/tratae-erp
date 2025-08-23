@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isLoading: true, error: null });
 
-          const response = await api.post('/auth/login', {
+          const response = await api.post('/api/auth/login', {
             email,
             password,
           });
@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthStore>()(
           // Configurar token no axios
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-          const response = await api.get('/auth/verify');
+          const response = await api.get('/api/auth/verify');
           const { user } = response.data;
 
           set({
