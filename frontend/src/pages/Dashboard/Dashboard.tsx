@@ -1,12 +1,19 @@
 import React from 'react';
 import { Container, Paper, Typography, Grid, Card, CardContent, CardActions, Button, Box } from '@mui/material';
-import { Assignment, Science } from '@mui/icons-material';
+import { Assignment, Science, Business } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const modules = [
+    {
+      title: 'Comercial',
+      description: 'Entidades e ordens de coleta',
+      icon: <Business sx={{ fontSize: 40 }} />,
+      color: '#1976d2',
+      path: '/comercial'
+    },
     {
       title: 'Qualidade',
       description: 'Controle de qualidade, produtos e características físico-químicas',

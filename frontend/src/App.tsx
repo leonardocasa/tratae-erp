@@ -8,6 +8,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { themeConfig } from './config/theme';
 import { Toaster } from 'react-hot-toast';
 import QualidadeRoutes from './modules/Qualidade/QualidadeRoutes';
+import ComercialRoutes from './modules/Comercial/ComercialRoutes';
 
 const theme = createTheme(themeConfig);
 
@@ -22,6 +23,7 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="qualidade/*" element={<QualidadeRoutes />} />
+            <Route path="comercial/*" element={<ComercialRoutes />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -9,7 +9,6 @@ const QualidadeRoutes: React.FC = () => {
       <Route index element={<Navigate to="produtos" replace />} />
       <Route path="produtos" element={<ProdutosList />} />
       <Route path="caracteristicas" element={<CaracteristicasList />} />
-      <Route path="*" element={<Navigate to="produtos" replace />} />
     </Routes>
   );
 };

@@ -89,34 +89,20 @@ export const cnpjService = {
 };
 
 export const comercialService = {
-  // Clientes
-  listarClientes: () => api.get('/api/comercial/clientes'),
-  obterCliente: (id: string) => api.get(`/api/comercial/clientes/${id}`),
-  criarCliente: (data: any) => api.post('/api/comercial/clientes', data),
-  atualizarCliente: (id: string, data: any) => api.put(`/api/comercial/clientes/${id}`, data),
-  excluirCliente: (id: string) => api.delete(`/api/comercial/clientes/${id}`),
-  
-  // Fornecedores
-  listarFornecedores: () => api.get('/api/comercial/fornecedores'),
-  obterFornecedor: (id: string) => api.get(`/api/comercial/fornecedores/${id}`),
-  criarFornecedor: (data: any) => api.post('/api/comercial/fornecedores', data),
-  atualizarFornecedor: (id: string, data: any) => api.put(`/api/comercial/fornecedores/${id}`, data),
-  excluirFornecedor: (id: string) => api.delete(`/api/comercial/fornecedores/${id}`),
-  
-  // Transportadores
-  listarTransportadores: () => api.get('/api/comercial/transportadores'),
-  obterTransportador: (id: string) => api.get(`/api/comercial/transportadores/${id}`),
-  criarTransportador: (data: any) => api.post('/api/comercial/transportadores', data),
-  atualizarTransportador: (id: string, data: any) => api.put(`/api/comercial/transportadores/${id}`, data),
-  excluirTransportador: (id: string) => api.delete(`/api/comercial/transportadores/${id}`),
-  
+  // Entidades (clientes, fornecedores, transportadoras)
+  listarEntidades: (params?: any) => api.get('/api/comercial/entidades', { params }),
+  obterEntidade: (id: string) => api.get(`/api/comercial/entidades/${id}`),
+  criarEntidade: (data: any) => api.post('/api/comercial/entidades', data),
+  atualizarEntidade: (id: string, data: any) => api.put(`/api/comercial/entidades/${id}`, data),
+  excluirEntidade: (id: string) => api.delete(`/api/comercial/entidades/${id}`),
+
   // Ordens de Coleta
-  listarOrdensColeta: () => api.get('/api/comercial/ordens-coleta'),
+  listarOrdensColeta: (params?: any) => api.get('/api/comercial/ordens-coleta', { params }),
   obterOrdemColeta: (id: string) => api.get(`/api/comercial/ordens-coleta/${id}`),
   criarOrdemColeta: (data: any) => api.post('/api/comercial/ordens-coleta', data),
-  atualizarOrdemColeta: (id: string, data: any) => api.put(`/api/comercial/ordens-coleta/${id}`, data),
+  atualizarStatus: (id: string, status: string, observacoes?: string) =>
+    api.patch(`/api/comercial/ordens-coleta/${id}/status`, { status, observacoes }),
   excluirOrdemColeta: (id: string) => api.delete(`/api/comercial/ordens-coleta/${id}`),
-  atualizarStatus: (id: string, status: string) => api.patch(`/api/comercial/ordens-coleta/${id}/status`, { status }),
 };
 
 export const manufaturaService = {
