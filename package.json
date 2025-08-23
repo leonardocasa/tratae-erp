@@ -1,0 +1,23 @@
+{
+  "name": "tratae-erp",
+  "version": "1.0.0",
+  "description": "Sistema ERP para empresa TRATAE - Módulos Comercial, Manufatura e Qualidade",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:frontend": "cd frontend && yarn dev",
+    "dev:backend": "cd backend && yarn dev",
+    "build": "yarn build:frontend && yarn build:backend",
+    "build:frontend": "cd frontend && yarn build",
+    "build:backend": "cd backend && yarn build",
+    "install:all": "yarn install && cd frontend && yarn install && cd ../backend && yarn install",
+    "check_environment": "node scripts/check-environment.js",
+    "setup": "yarn install:all && yarn check_environment"
+  },
+  "keywords": ["erp", "tratae", "comercial", "manufatura", "qualidade"],
+  "author": "TRATAE Development Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

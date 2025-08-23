@@ -1,0 +1,40 @@
+services:
+  # Backend API
+  - type: web
+    name: tratae-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && yarn install
+    startCommand: cd backend && yarn start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RECEITA_WS_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        value: https://tratae-frontend.onrender.com
+
+  # Frontend
+  - type: web
+    name: tratae-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && yarn install && yarn build
+    staticPublishPath: frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://tratae-backend.onrender.com
+      - key: REACT_APP_SUPABASE_URL
+        sync: false
+      - key: REACT_APP_SUPABASE_ANON_KEY
+        sync: false
