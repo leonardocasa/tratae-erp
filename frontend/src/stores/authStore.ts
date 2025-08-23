@@ -51,6 +51,9 @@ export const useAuthStore = create<AuthStore>()(
 
           const { token, user } = response.data;
 
+          // Persistir token para os interceptors e futuras sessões
+          localStorage.setItem('token', token);
+
           // Configurar token no axios
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
@@ -72,8 +75,9 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
-        // Remover token do axios
+        // Remover token do axios e do localStorage
         delete api.defaults.headers.common['Authorization'];
+        localStorage.removeItem('token');
 
         set({
           user: null,
@@ -86,8 +90,9 @@ export const useAuthStore = create<AuthStore>()(
 
       verifyToken: async () => {
         const { token } = get();
+        const localToken = localStorage.getItem('token');
         
-        if (!token) {
+        if (!token && !localToken) {
           set({ isAuthenticated: false });
           return;
         }
@@ -95,20 +100,26 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isLoading: true });
 
-          // Configurar token no axios
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          // Garantir header do axios
+          const useToken = token || (localToken as string);
+          api.defaults.headers.common['Authorization'] = `Bearer ${useToken}`;
 
           const response = await api.get('/api/auth/verify');
           const { user } = response.data;
 
+          // Reforçar token no localStorage
+          if (useToken) localStorage.setItem('token', useToken);
+
           set({
             user,
+            token: useToken,
             isAuthenticated: true,
             isLoading: false,
           });
         } catch (error: any) {
           // Token inválido ou expirado
           delete api.defaults.headers.common['Authorization'];
+          localStorage.removeItem('token');
           set({
             user: null,
             token: null,
