@@ -25,9 +25,8 @@ services:
         value: https://tratae-frontend.onrender.com
 
   # Frontend
-  - type: web
+  - type: static
     name: tratae-frontend
-    env: static
     plan: free
     buildCommand: cd frontend && yarn install && yarn build
     staticPublishPath: frontend/build
