@@ -19,7 +19,7 @@ const ProdutosList: React.FC = () => {
 
   const carregar = async () => {
     try {
-      const { data } = await qualidadeService.getProdutos();
+      const { data } = await qualidadeService.listarProdutos();
       setProdutos(data || []);
     } catch (e) {
       toast.error('Falha ao carregar produtos');
@@ -30,7 +30,7 @@ const ProdutosList: React.FC = () => {
 
   const salvar = async () => {
     try {
-      await qualidadeService.createProduto(form);
+      await qualidadeService.criarProduto(form);
       setOpen(false);
       setForm({ tipo: 'produto_acabado' });
       await carregar();

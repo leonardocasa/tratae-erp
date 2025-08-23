@@ -16,7 +16,7 @@ const CaracteristicasList: React.FC = () => {
 
   const carregar = async () => {
     try {
-      const { data } = await qualidadeService.getCaracteristicas();
+      const { data } = await qualidadeService.listarCaracteristicas();
       setItems(data || []);
     } catch (e) {
       toast.error('Falha ao carregar características');
@@ -27,7 +27,7 @@ const CaracteristicasList: React.FC = () => {
 
   const salvar = async () => {
     try {
-      await qualidadeService.createCaracteristica(form);
+      await qualidadeService.criarCaracteristica(form);
       setOpen(false);
       setForm({});
       await carregar();
