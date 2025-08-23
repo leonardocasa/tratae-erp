@@ -62,7 +62,7 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
         } catch (error: any) {
-          const errorMessage = error.response?.data?.error || 'Erro ao fazer login';
+          const errorMessage = error.response?.data?.error || 'Erro ao fazer login - v2';
           set({
             isLoading: false,
             error: errorMessage,
