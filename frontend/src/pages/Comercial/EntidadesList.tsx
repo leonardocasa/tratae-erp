@@ -131,7 +131,7 @@ const EntidadesList: React.FC = () => {
   };
 
   const excluir = async (id: string) => {
-    if (!confirm('Deseja realmente excluir a entidade?')) return;
+    if (!window.confirm('Deseja realmente excluir a entidade?')) return;
     try { await comercialService.excluirEntidade(id); await carregar(); toast.success('Entidade excluída'); }
     catch (e: any) { toast.error(e?.response?.data?.error || 'Falha ao excluir'); }
   };
