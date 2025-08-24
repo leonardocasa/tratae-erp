@@ -20,25 +20,13 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={
-              <MainLayout>
-                <Dashboard />
-              </MainLayout>
-            } />
-            <Route path="qualidade/*" element={
-              <MainLayout>
-                <QualidadeRoutes />
-              </MainLayout>
-            } />
-            <Route path="comercial/*" element={
-              <MainLayout>
-                <ComercialRoutes />
-              </MainLayout>
-            } />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/dashboard" element={
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          } />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
       <Toaster position="top-right" />
