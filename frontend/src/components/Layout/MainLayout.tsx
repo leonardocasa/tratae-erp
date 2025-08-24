@@ -29,10 +29,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <>
-      <AppBar position="static" sx={{ mb: 3 }}>
+      <AppBar position="static" sx={{ mb: 3, backgroundColor: 'red' }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            TRATAE ERP
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'white' }}>
+            TRATAE ERP - HEADER VISÍVEL
           </Typography>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -45,6 +45,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               onClick={handleHome}
               title="Voltar ao Dashboard"
               sx={{ 
+                color: 'white',
                 '&:hover': { 
                   backgroundColor: 'rgba(255, 255, 255, 0.1)' 
                 } 
@@ -58,6 +59,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               onClick={handleLogout}
               title="Sair do sistema"
               sx={{ 
+                color: 'white',
                 '&:hover': { 
                   backgroundColor: 'rgba(255, 255, 255, 0.1)' 
                 } 
