@@ -36,7 +36,7 @@ import MDInput from "../../../components-template/MDInput";
 import Breadcrumbs from "../../Breadcrumbs";
 import NotificationItem from "../../Items/NotificationItem";
 
-import AuthService from "services/auth-service";
+// Removed AuthService import - using our own auth store instead
 
 // Custom styles for DashboardNavbar
 import {
@@ -45,7 +45,7 @@ import {
   navbarRow,
   navbarIconButton,
   navbarMobileMenu,
-} from "examples/Navbars/DashboardNavbar/styles";
+} from "./styles";
 
 // Material Dashboard 2 React context
 import {
@@ -130,8 +130,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
   });
 
   const handleLogOut = async () => {
-    const response = await AuthService.logout();
-    authContext.logout();
+    // Use our auth store logout function
+    if (authContext && authContext.logout) {
+      authContext.logout();
+    }
   };
 
   return (
