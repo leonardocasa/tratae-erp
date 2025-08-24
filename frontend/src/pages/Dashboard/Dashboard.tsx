@@ -1,23 +1,10 @@
 import React from 'react';
-import { Container, Paper, Typography, Grid, Card, CardContent, CardActions, Button, Box, AppBar, Toolbar, IconButton } from '@mui/material';
-import { Assignment, Science, Business, Logout } from '@mui/icons-material';
+import { Container, Paper, Typography, Grid, Card, CardContent, CardActions, Button, Box } from '@mui/material';
+import { Assignment, Science, Business } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
-import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { logout, user } = useAuthStore();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logout realizado com sucesso!');
-      navigate('/login');
-    } catch (error) {
-      toast.error('Erro ao fazer logout');
-    }
-  };
 
   const modules = [
     {
@@ -45,38 +32,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{ mb: 3 }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            TRATAE ERP
-          </Typography>
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            Olá, {user?.nome || user?.email || 'Usuário'}
-          </Typography>
-          <IconButton 
-            color="inherit" 
-            onClick={handleLogout}
-            title="Sair do sistema"
-            sx={{ 
-              '&:hover': { 
-                backgroundColor: 'rgba(255, 255, 255, 0.1)' 
-              } 
-            }}
-          >
-            <Logout />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="lg">
-        <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h4" gutterBottom>
-            Bem-vindo ao TRATAE ERP
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Sistema integrado para gestão de produção e comercialização
-          </Typography>
-        </Paper>
+      <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          Bem-vindo ao TRATAE ERP
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Sistema integrado para gestão de produção e comercialização
+        </Typography>
+      </Paper>
 
       <Grid container spacing={3}>
         {modules.map((module) => (
@@ -119,7 +82,6 @@ const Dashboard: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-      </Container>
     </>
   );
 };

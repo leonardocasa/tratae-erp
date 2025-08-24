@@ -5,6 +5,7 @@ import { CssBaseline } from '@mui/material';
 import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import MainLayout from './components/Layout/MainLayout';
 import { themeConfig } from './config/theme';
 import { Toaster } from 'react-hot-toast';
 import QualidadeRoutes from './modules/Qualidade/QualidadeRoutes';
@@ -21,9 +22,21 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<ProtectedRoute />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="qualidade/*" element={<QualidadeRoutes />} />
-            <Route path="comercial/*" element={<ComercialRoutes />} />
+            <Route path="dashboard" element={
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            } />
+            <Route path="qualidade/*" element={
+              <MainLayout>
+                <QualidadeRoutes />
+              </MainLayout>
+            } />
+            <Route path="comercial/*" element={
+              <MainLayout>
+                <ComercialRoutes />
+              </MainLayout>
+            } />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
