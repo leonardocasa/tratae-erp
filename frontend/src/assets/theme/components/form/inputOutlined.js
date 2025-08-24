@@ -19,7 +19,7 @@ import borders from "../../base/borders";
 import typography from "../../base/typography";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { inputBorderColor, info, grey, transparent } = colors;
 const { borderRadius } = borders;

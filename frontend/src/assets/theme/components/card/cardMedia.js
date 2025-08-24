@@ -17,7 +17,7 @@ Coded by www.creative-tim.com
 import borders from "../../base/borders";
 
 // Material Dashboard 2 React Helper Functions
-import pxToRem from "../functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { borderRadius } = borders;
 

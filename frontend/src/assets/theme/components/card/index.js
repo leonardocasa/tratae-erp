@@ -19,7 +19,7 @@ import borders from "../../base/borders";
 import boxShadows from "../../base/boxShadows";
 
 // Material Dashboard 2 React Helper Function
-import rgba from "../functions/rgba";
+import rgba from "../../functions/rgba";
 
 const { black, white } = colors;
 const { borderWidth, borderRadius } = borders;

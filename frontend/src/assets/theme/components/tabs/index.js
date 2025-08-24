@@ -19,7 +19,7 @@ import borders from "../../base/borders";
 import boxShadows from "../../base/boxShadows";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { grey, white } = colors;
 const { borderRadius } = borders;

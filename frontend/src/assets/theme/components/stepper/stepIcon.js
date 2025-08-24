@@ -17,8 +17,8 @@ Coded by www.creative-tim.com
 import colors from "../../base/colors";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
-import boxShadow from "../functions/boxShadow";
+import pxToRem from "../../functions/pxToRem";
+import boxShadow from "../../functions/boxShadow";
 
 const { white } = colors;
 

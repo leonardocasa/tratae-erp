@@ -18,7 +18,7 @@ import colors from "../../base/colors";
 import typography from "../../base/typography";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { dark } = colors;
 const { size, fontWeightBold } = typography;

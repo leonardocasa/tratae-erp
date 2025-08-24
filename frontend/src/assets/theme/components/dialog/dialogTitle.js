@@ -17,7 +17,7 @@ Coded by www.creative-tim.com
 import typography from "../../base/typography";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { size } = typography;
 

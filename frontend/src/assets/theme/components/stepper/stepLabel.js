@@ -18,8 +18,8 @@ import typography from "../../base/typography";
 import colors from "../../base/colors";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
-import rgba from "../functions/rgba";
+import pxToRem from "../../functions/pxToRem";
+import rgba from "../../functions/rgba";
 
 const { size, fontWeightRegular } = typography;
 const { white } = colors;

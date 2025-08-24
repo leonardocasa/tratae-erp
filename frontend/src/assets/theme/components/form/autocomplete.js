@@ -20,7 +20,7 @@ import colors from "../../base/colors";
 import borders from "../../base/borders";
 
 // Material Dashboard 2 React helper functions
-import pxToRem from "../functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { lg } = boxShadows;
 const { size } = typography;

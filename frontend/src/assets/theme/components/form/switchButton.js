@@ -19,9 +19,9 @@ import borders from "../../base/borders";
 import boxShadows from "../../base/boxShadows";
 
 // Material Dashboard 2 React helper functions
-// import rgba from "../functions/rgba";
-import pxToRem from "../functions/pxToRem";
-import linearGradient from "../functions/linearGradient";
+// import rgba from "../../functions/rgba";
+import pxToRem from "../../functions/pxToRem";
+import linearGradient from "../../functions/linearGradient";
 
 const { white, gradients, grey, transparent } = colors;
 const { borderWidth } = borders;
