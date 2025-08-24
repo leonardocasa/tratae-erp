@@ -14,7 +14,7 @@ Coded by www.creative-tim.com
 */
 
 // Material Dashboard 2 React base styles
-import typography from "assets/theme/base/typography";
+import typography from "../../base/typography";
 
 // Material Dashboard 2 React helper functions
 import pxToRem from "../functions/pxToRem";

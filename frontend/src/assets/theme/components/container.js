@@ -14,7 +14,7 @@ Coded by www.creative-tim.com
 */
 
 // Material Dashboard 2 React base styles
-import breakpoints from "assets/theme/base/breakpoints";
+import breakpoints from "../base/breakpoints";
 
 // Material Dashboard 2 React helper functions
 import pxToRem from "../functions/pxToRem";

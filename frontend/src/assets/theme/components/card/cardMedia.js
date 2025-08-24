@@ -14,7 +14,7 @@ Coded by www.creative-tim.com
 */
 
 // Material Dashboard 2 React Base Styles
-import borders from "assets/theme/base/borders";
+import borders from "../../base/borders";
 
 // Material Dashboard 2 React Helper Functions
 import pxToRem from "../functions/pxToRem";
