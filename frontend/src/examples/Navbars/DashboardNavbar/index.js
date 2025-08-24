@@ -29,12 +29,12 @@ import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDInput from "components/MDInput";
+import MDBox from "../../../components-template/MDBox";
+import MDInput from "../../../components-template/MDInput";
 
 // Material Dashboard 2 React example components
-import Breadcrumbs from "examples/Breadcrumbs";
-import NotificationItem from "examples/Items/NotificationItem";
+import Breadcrumbs from "../../Breadcrumbs";
+import NotificationItem from "../../Items/NotificationItem";
 
 import AuthService from "services/auth-service";
 
@@ -53,9 +53,9 @@ import {
   setTransparentNavbar,
   setMiniSidenav,
   setOpenConfigurator,
-} from "context";
-import MDButton from "components/MDButton";
-import { AuthContext } from "context";
+} from "../../../context";
+import MDButton from "../../../components-template/MDButton";
+import { AuthContext } from "../../../context";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const authContext = useContext(AuthContext);
