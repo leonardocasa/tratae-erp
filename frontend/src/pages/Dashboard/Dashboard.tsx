@@ -15,6 +15,14 @@ import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatist
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
+  // Teste para verificar se os imports estão funcionando
+  console.log('🔍 Dashboard: Testando imports...');
+  console.log('MDBox:', MDBox);
+  console.log('DashboardLayout:', DashboardLayout);
+  console.log('DashboardNavbar:', DashboardNavbar);
+  console.log('Footer:', Footer);
+  console.log('ComplexStatisticsCard:', ComplexStatisticsCard);
+
   const modules = [
     {
       title: 'Comercial',
@@ -42,6 +50,22 @@ const Dashboard: React.FC = () => {
     }
   ];
 
+  // Teste simples primeiro
+  return (
+    <div style={{ padding: '20px', backgroundColor: '#ff0000', color: 'white', fontSize: '24px' }}>
+      <h1>🎯 TESTE - NOVO LAYOUT MATERIAL DASHBOARD</h1>
+      <p>Se você está vendo isso, o deploy está funcionando!</p>
+      <p>Verificando imports...</p>
+      <p>MDBox: {MDBox ? '✅ OK' : '❌ ERRO'}</p>
+      <p>DashboardLayout: {DashboardLayout ? '✅ OK' : '❌ ERRO'}</p>
+      <p>DashboardNavbar: {DashboardNavbar ? '✅ OK' : '❌ ERRO'}</p>
+      <p>Footer: {Footer ? '✅ OK' : '❌ ERRO'}</p>
+      <p>ComplexStatisticsCard: {ComplexStatisticsCard ? '✅ OK' : '❌ ERRO'}</p>
+    </div>
+  );
+
+  // Código original comentado para teste
+  /*
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -71,6 +95,7 @@ const Dashboard: React.FC = () => {
       <Footer />
     </DashboardLayout>
   );
+  */
 };
 
 export default Dashboard;
