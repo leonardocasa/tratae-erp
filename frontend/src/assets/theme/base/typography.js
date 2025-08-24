@@ -23,7 +23,7 @@ Coded by www.creative-tim.com
 import colors from "./colors";
 
 // Material Dashboard 2 React Helper Functions
-import pxToRem from "assets/theme/functions/pxToRem";
+import pxToRem from "../functions/pxToRem";
 
 const { dark } = colors;
 
