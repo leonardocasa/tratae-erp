@@ -4,13 +4,13 @@ import { Assignment, Science, Business } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 // Material Dashboard 2 React components
-import MDBox from '../../components-template/MDBox';
+import MDBox from 'components/MDBox';
 
 // Material Dashboard 2 React example components
-import DashboardLayout from '../../examples/LayoutContainers/DashboardLayout';
-import DashboardNavbar from '../../examples/Navbars/DashboardNavbar';
-import Footer from '../../examples/Footer';
-import ComplexStatisticsCard from '../../examples/Cards/StatisticsCards/ComplexStatisticsCard';
+import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
+import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
+import Footer from 'examples/Footer';
+import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
