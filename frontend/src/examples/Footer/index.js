@@ -21,11 +21,11 @@ import Link from "@mui/material/Link";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from "../../components-template/MDBox";
+import MDTypography from "../../components-template/MDTypography";
 
 // Material Dashboard 2 React base styles
-import typography from "assets/theme/base/typography";
+import typography from "../../assets/theme/base/typography";
 
 function Footer({ company, links }) {
   const { href, name } = company;
