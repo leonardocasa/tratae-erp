@@ -9,7 +9,8 @@ const router = express.Router();
 const entidadeValidation = [
   body('cnpj').notEmpty().withMessage('CNPJ é obrigatório'),
   body('razao_social').notEmpty().withMessage('Razão social é obrigatória'),
-  body('tipo').isIn(['cliente', 'fornecedor', 'transportadora']).withMessage('Tipo inválido'),
+  // Adiciona 'emissora' como tipo válido
+  body('tipo').isIn(['cliente', 'fornecedor', 'transportadora', 'emissora']).withMessage('Tipo inválido'),
   body('email').optional().isEmail().withMessage('Email inválido'),
   body('telefone').optional().notEmpty().withMessage('Telefone é obrigatório se fornecido')
 ];
@@ -22,12 +23,12 @@ const ordemColetaValidation = [
   body('transportadora_id').optional().notEmpty().withMessage('Transportadora é obrigatória se fornecida')
 ];
 
-// ===== ENTIDADES (CLIENTES, FORNECEDORES, TRANSPORTADORAS) =====
+// ===== ENTIDADES (CLIENTES, FORNECEDORES, TRANSPORTADORAS, EMISSORAS) =====
 
 // Listar entidades
 router.get('/entidades', requireSector('comercial'), async (req, res, next) => {
   try {
-    const { tipo, empresa_emissora } = req.query;
+    const { tipo, empresa_emissora, cnpj } = req.query;
     
     let query = supabase
       .from('entidades')
@@ -40,6 +41,10 @@ router.get('/entidades', requireSector('comercial'), async (req, res, next) => {
 
     if (empresa_emissora !== undefined) {
       query = query.eq('empresa_emissora', empresa_emissora === 'true');
+    }
+
+    if (cnpj) {
+      query = query.eq('cnpj', cnpj);
     }
 
     const { data: entidades, error } = await query;
@@ -100,7 +105,7 @@ router.post('/entidades', entidadeValidation, requireSector('comercial'), async 
       observacoes
     } = req.body;
 
-    // Verificar se CNPJ já existe
+    // Verificar CNPJ duplicado
     const { data: existingEntidade } = await supabase
       .from('entidades')
       .select('id')
@@ -114,6 +119,9 @@ router.post('/entidades', entidadeValidation, requireSector('comercial'), async 
       });
     }
 
+    // Se o tipo for 'emissora', garantir flag empresa_emissora = true
+    const isEmissora = tipo === 'emissora' || Boolean(empresa_emissora);
+
     const { data: novaEntidade, error } = await supabase
       .from('entidades')
       .insert({
@@ -125,7 +133,7 @@ router.post('/entidades', entidadeValidation, requireSector('comercial'), async 
         inscricao_municipal,
         endereco,
         contato,
-        empresa_emissora,
+        empresa_emissora: isEmissora,
         observacoes,
         created_by: req.user.id,
         created_at: new Date().toISOString()
@@ -157,6 +165,12 @@ router.put('/entidades/:id', entidadeValidation, requireSector('comercial'), asy
 
     const { id } = req.params;
     const updateData = req.body;
+
+    // Garantir consistência entre tipo 'emissora' e flag empresa_emissora
+    if (updateData.tipo === 'emissora') {
+      updateData.empresa_emissora = true;
+    }
+
     updateData.updated_at = new Date().toISOString();
     updateData.updated_by = req.user.id;
 
@@ -186,7 +200,7 @@ router.delete('/entidades/:id', requireSector('comercial'), async (req, res, nex
   try {
     const { id } = req.params;
 
-    // Verificar se a entidade está sendo usada em ordens de coleta
+    // Não permitir deletar entidade vinculada em OC
     const { data: ordensExistentes } = await supabase
       .from('ordens_coleta')
       .select('id')
@@ -209,9 +223,7 @@ router.delete('/entidades/:id', requireSector('comercial'), async (req, res, nex
       throw error;
     }
 
-    res.json({
-      message: 'Entidade deletada com sucesso'
-    });
+    res.json({ message: 'Entidade deletada com sucesso' });
 
   } catch (error) {
     next(error);
@@ -229,8 +241,8 @@ router.get('/ordens-coleta', requireSector('comercial'), async (req, res, next) 
       .from('ordens_coleta')
       .select(`
         *,
-        empresa_emissora:entidades!empresa_emissora_id(id, razao_social, nome_fantasia),
-        transportadora:entidades!transportadora_id(id, razao_social, nome_fantasia),
+        empresa_emissora:entidades!empresa_emissora_id(id, razao_social, nome_fantasia, tipo),
+        transportadora:entidades!transportadora_id(id, razao_social, nome_fantasia, tipo),
         produto:produtos(id, nome, codigo)
       `)
       .order('created_at', { ascending: false });
@@ -303,7 +315,7 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
       prazo_entrega
     } = req.body;
 
-    // Verificar se a empresa emissora existe e é do tipo correto
+    // Verificar empresa emissora
     const { data: empresaEmissora } = await supabase
       .from('entidades')
       .select('id, tipo, empresa_emissora')
@@ -317,7 +329,9 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
       });
     }
 
-    if (!empresaEmissora.empresa_emissora) {
+    // Aceitar emissora se flag true ou tipo 'emissora'
+    const podeEmitir = empresaEmissora.empresa_emissora === true || empresaEmissora.tipo === 'emissora';
+    if (!podeEmitir) {
       return res.status(400).json({
         error: 'Empresa selecionada não é uma empresa emissora',
         code: 'NOT_EMPRESA_EMISSORA'
@@ -416,14 +430,9 @@ router.patch('/ordens-coleta/:id/status', requireSector('comercial'), async (req
       updateData.observacoes = observacoes;
     }
 
-    // Adicionar timestamps específicos baseados no status
-    if (status === 'em_separacao') {
-      updateData.inicio_separacao = new Date().toISOString();
-    } else if (status === 'pronto_coleta') {
-      updateData.fim_separacao = new Date().toISOString();
-    } else if (status === 'finalizada') {
-      updateData.data_finalizacao = new Date().toISOString();
-    }
+    if (status === 'em_separacao') updateData.inicio_separacao = new Date().toISOString();
+    if (status === 'pronto_coleta') updateData.fim_separacao = new Date().toISOString();
+    if (status === 'finalizada') updateData.data_finalizacao = new Date().toISOString();
 
     const { data: ordemAtualizada, error } = await supabase
       .from('ordens_coleta')
@@ -456,7 +465,6 @@ router.delete('/ordens-coleta/:id', requireSector('comercial'), async (req, res,
   try {
     const { id } = req.params;
 
-    // Verificar se a ordem pode ser deletada (apenas se estiver aberta)
     const { data: ordem } = await supabase
       .from('ordens_coleta')
       .select('status')
@@ -483,9 +491,7 @@ router.delete('/ordens-coleta/:id', requireSector('comercial'), async (req, res,
       throw error;
     }
 
-    res.json({
-      message: 'Ordem de coleta deletada com sucesso'
-    });
+    res.json({ message: 'Ordem de coleta deletada com sucesso' });
 
   } catch (error) {
     next(error);
@@ -495,12 +501,10 @@ router.delete('/ordens-coleta/:id', requireSector('comercial'), async (req, res,
 // Estatísticas do módulo comercial
 router.get('/stats', requireSector('comercial'), async (req, res, next) => {
   try {
-    // Contar entidades por tipo
     const { data: entidades } = await supabase
       .from('entidades')
       .select('tipo, empresa_emissora');
 
-    // Contar ordens por status
     const { data: ordens } = await supabase
       .from('ordens_coleta')
       .select('status, created_at');
@@ -511,7 +515,7 @@ router.get('/stats', requireSector('comercial'), async (req, res, next) => {
         clientes: entidades?.filter(e => e.tipo === 'cliente').length || 0,
         fornecedores: entidades?.filter(e => e.tipo === 'fornecedor').length || 0,
         transportadoras: entidades?.filter(e => e.tipo === 'transportadora').length || 0,
-        empresas_emissoras: entidades?.filter(e => e.empresa_emissora).length || 0
+        emissoras: entidades?.filter(e => e.tipo === 'emissora' || e.empresa_emissora).length || 0
       },
       ordens_coleta: {
         total: ordens?.length || 0,
