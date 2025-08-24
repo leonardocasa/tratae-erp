@@ -45,7 +45,21 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      {/* NOVO HEADER COM LOGOUT */}
+      {/* TESTE DRÁSTICO - HEADER VERMELHO GRANDE */}
+      <div style={{
+        backgroundColor: 'red',
+        color: 'white',
+        padding: '30px',
+        marginBottom: '30px',
+        fontSize: '32px',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        border: '5px solid black'
+      }}>
+        🚨 TESTE DE ATUALIZAÇÃO - SE VOCÊ VÊ ISSO, O SISTEMA ATUALIZOU! 🚨
+      </div>
+
+      {/* HEADER COM LOGOUT */}
       <AppBar position="static" sx={{ mb: 3, backgroundColor: '#1976d2' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'white' }}>
