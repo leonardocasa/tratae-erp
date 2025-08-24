@@ -30,7 +30,17 @@ ALTER TABLE entidades DROP COLUMN IF EXISTS fonte_consulta;
 
 -- 3. Garantir que o campo CNPJ existe e é único
 ALTER TABLE entidades ADD COLUMN IF NOT EXISTS cnpj VARCHAR(14);
-ALTER TABLE entidades ADD CONSTRAINT IF NOT EXISTS entidades_cnpj_key UNIQUE (cnpj);
+
+-- 3.1. Adicionar constraint UNIQUE para CNPJ (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'entidades_cnpj_key'
+    ) THEN
+        ALTER TABLE entidades ADD CONSTRAINT entidades_cnpj_key UNIQUE (cnpj);
+    END IF;
+END $$;
 
 -- 4. Restaurar constraint original do tipo
 ALTER TABLE entidades DROP CONSTRAINT IF EXISTS entidades_tipo_check;
