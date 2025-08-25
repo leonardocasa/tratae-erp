@@ -22,7 +22,7 @@ const Dashboard: React.FC = () => {
       icon: <Business />,
       color: 'info',
       count: '150',
-      path: '/comercial'
+      path: '/comercial/entidades'
     },
     {
       title: 'Qualidade',
