@@ -5,6 +5,7 @@ import { CssBaseline } from '@mui/material';
 import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import OrdensKanban from './pages/Comercial/OrdensKanban';
+import EntidadesList from './pages/Comercial/EntidadesList';
 import { Toaster } from 'react-hot-toast';
 
 // Material Dashboard 2 React themes
@@ -38,6 +39,7 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/comercial/ordens" element={<OrdensKanban />} />
+                <Route path="/comercial/entidades" element={<EntidadesList />} />
               </Route>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

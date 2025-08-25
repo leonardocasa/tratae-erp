@@ -100,8 +100,8 @@ export const comercialService = {
   listarOrdensColeta: (params?: any) => api.get('/api/comercial/ordens-coleta', { params }),
   obterOrdemColeta: (id: string) => api.get(`/api/comercial/ordens-coleta/${id}`),
   criarOrdemColeta: (data: any) => api.post('/api/comercial/ordens-coleta', data),
-  atualizarStatus: (id: string, status: string, observacoes?: string) =>
-    api.patch(`/api/comercial/ordens-coleta/${id}/status`, { status, observacoes }),
+  atualizarStatus: (id: string, status: string, observacao?: string) =>
+    api.patch(`/api/comercial/ordens-coleta/${id}/status`, { status, observacao }),
   excluirOrdemColeta: (id: string) => api.delete(`/api/comercial/ordens-coleta/${id}`),
 };
 
