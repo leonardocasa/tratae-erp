@@ -1,26 +1,27 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { supabase } = require('../config/supabase');
+const { supabaseAdmin: supabase } = require('../config/supabase');
 const { createValidationError, createNotFoundError, requireSector } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Validações
+// Validações (nova estrutura)
 const entidadeValidation = [
-  body('cnpj').notEmpty().withMessage('CNPJ é obrigatório'),
-  body('razao_social').notEmpty().withMessage('Razão social é obrigatória'),
-  // Adiciona 'emissora' como tipo válido
-  body('tipo').isIn(['cliente', 'fornecedor', 'transportadora', 'emissora']).withMessage('Tipo inválido'),
+  body('documento_tipo').isIn(['CNPJ', 'CPF']).withMessage('documento_tipo deve ser CNPJ ou CPF'),
+  body('cnpj').if(body('documento_tipo').equals('CNPJ')).isLength({ min: 11 }).withMessage('CNPJ obrigatório para documento_tipo=CNPJ'),
+  body('cpf').if(body('documento_tipo').equals('CPF')).isLength({ min: 11 }).withMessage('CPF obrigatório para documento_tipo=CPF'),
+  body('razao_social').notEmpty().withMessage('Razão social / nome é obrigatório'),
+  body('tipos').isArray({ min: 1 }).withMessage('Informe ao menos um tipo'),
   body('email').optional().isEmail().withMessage('Email inválido'),
-  body('telefone').optional().notEmpty().withMessage('Telefone é obrigatório se fornecido')
 ];
 
 const ordemColetaValidation = [
-  body('empresa_emissora_id').notEmpty().withMessage('Empresa emissora é obrigatória'),
-  body('produto_id').notEmpty().withMessage('Produto é obrigatório'),
-  body('quantidade').isFloat({ min: 0.1 }).withMessage('Quantidade deve ser maior que zero'),
-  body('tipo_embalagem').notEmpty().withMessage('Tipo de embalagem é obrigatório'),
-  body('transportadora_id').optional().notEmpty().withMessage('Transportadora é obrigatória se fornecida')
+  body('emissora_id').notEmpty().withMessage('Empresa emissora é obrigatória'),
+  body('produto').notEmpty().withMessage('Produto é obrigatório'),
+  body('quantidade').isFloat({ min: 0.0001 }).withMessage('Quantidade deve ser maior que zero'),
+  body('unidade').optional().isString(),
+  body('embalagem').optional().isString(),
+  body('transportadora_id').optional().isString()
 ];
 
 // ===== ENTIDADES (CLIENTES, FORNECEDORES, TRANSPORTADORAS, EMISSORAS) =====
@@ -28,7 +29,7 @@ const ordemColetaValidation = [
 // Listar entidades
 router.get('/entidades', requireSector('comercial'), async (req, res, next) => {
   try {
-    const { tipo, empresa_emissora, cnpj } = req.query;
+    const { tipo, cnpj, cpf } = req.query;
     
     let query = supabase
       .from('entidades')
@@ -36,15 +37,16 @@ router.get('/entidades', requireSector('comercial'), async (req, res, next) => {
       .order('razao_social');
 
     if (tipo) {
-      query = query.eq('tipo', tipo);
-    }
-
-    if (empresa_emissora !== undefined) {
-      query = query.eq('empresa_emissora', empresa_emissora === 'true');
+      // tipos é um array: entidades que contêm o tipo informado
+      query = query.contains('tipos', [tipo]);
     }
 
     if (cnpj) {
       query = query.eq('cnpj', cnpj);
+    }
+
+    if (cpf) {
+      query = query.eq('cpf', cpf);
     }
 
     const { data: entidades, error } = await query;
@@ -84,7 +86,7 @@ router.get('/entidades/:id', requireSector('comercial'), async (req, res, next) 
   }
 });
 
-// Criar entidade
+// Criar entidade (nova estrutura)
 router.post('/entidades', entidadeValidation, requireSector('comercial'), async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -93,49 +95,42 @@ router.post('/entidades', entidadeValidation, requireSector('comercial'), async 
     }
 
     const {
+      documento_tipo,
       cnpj,
+      cpf,
       razao_social,
       nome_fantasia,
-      tipo,
-      inscricao_estadual,
-      inscricao_municipal,
-      endereco,
-      contato,
-      empresa_emissora = false,
-      observacoes
+      data_abertura,
+      capital_social,
+      email,
+      fone,
+      tipos = [],
+      api_raw
     } = req.body;
 
-    // Verificar CNPJ duplicado
-    const { data: existingEntidade } = await supabase
-      .from('entidades')
-      .select('id')
-      .eq('cnpj', cnpj)
-      .single();
-
-    if (existingEntidade) {
-      return res.status(409).json({
-        error: 'CNPJ já cadastrado',
-        code: 'CNPJ_ALREADY_EXISTS'
-      });
+    // Duplicidade de documento
+    if (documento_tipo === 'CNPJ' && cnpj) {
+      const { data: dup } = await supabase.from('entidades').select('id').eq('cnpj', cnpj).single();
+      if (dup) return res.status(409).json({ error: 'CNPJ já cadastrado' });
+    } else if (documento_tipo === 'CPF' && cpf) {
+      const { data: dup } = await supabase.from('entidades').select('id').eq('cpf', cpf).single();
+      if (dup) return res.status(409).json({ error: 'CPF já cadastrado' });
     }
-
-    // Se o tipo for 'emissora', garantir flag empresa_emissora = true
-    const isEmissora = tipo === 'emissora' || Boolean(empresa_emissora);
 
     const { data: novaEntidade, error } = await supabase
       .from('entidades')
       .insert({
-        cnpj,
+        documento_tipo,
+        cnpj: documento_tipo === 'CNPJ' ? cnpj : null,
+        cpf: documento_tipo === 'CPF' ? cpf : null,
         razao_social,
         nome_fantasia,
-        tipo,
-        inscricao_estadual,
-        inscricao_municipal,
-        endereco,
-        contato,
-        empresa_emissora: isEmissora,
-        observacoes,
-        created_by: req.user.id,
+        data_abertura: data_abertura || null,
+        capital_social: capital_social || null,
+        email: email || null,
+        fone: fone || null,
+        tipos,
+        api_raw: api_raw || null,
         created_at: new Date().toISOString()
       })
       .select()
@@ -155,7 +150,7 @@ router.post('/entidades', entidadeValidation, requireSector('comercial'), async 
   }
 });
 
-// Atualizar entidade
+// Atualizar entidade (parcial)
 router.put('/entidades/:id', entidadeValidation, requireSector('comercial'), async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -164,15 +159,20 @@ router.put('/entidades/:id', entidadeValidation, requireSector('comercial'), asy
     }
 
     const { id } = req.params;
-    const updateData = req.body;
-
-    // Garantir consistência entre tipo 'emissora' e flag empresa_emissora
-    if (updateData.tipo === 'emissora') {
-      updateData.empresa_emissora = true;
-    }
-
-    updateData.updated_at = new Date().toISOString();
-    updateData.updated_by = req.user.id;
+    const updateData = {
+      documento_tipo: req.body.documento_tipo,
+      cnpj: req.body.documento_tipo === 'CNPJ' ? req.body.cnpj : null,
+      cpf: req.body.documento_tipo === 'CPF' ? req.body.cpf : null,
+      razao_social: req.body.razao_social,
+      nome_fantasia: req.body.nome_fantasia,
+      data_abertura: req.body.data_abertura || null,
+      capital_social: req.body.capital_social || null,
+      email: req.body.email || null,
+      fone: req.body.fone || null,
+      tipos: Array.isArray(req.body.tipos) ? req.body.tipos : [],
+      api_raw: req.body.api_raw || null,
+      updated_at: new Date().toISOString(),
+    };
 
     const { data: entidadeAtualizada, error } = await supabase
       .from('entidades')
@@ -204,7 +204,7 @@ router.delete('/entidades/:id', requireSector('comercial'), async (req, res, nex
     const { data: ordensExistentes } = await supabase
       .from('ordens_coleta')
       .select('id')
-      .or(`empresa_emissora_id.eq.${id},transportadora_id.eq.${id}`)
+      .or(`emissora_id.eq.${id},transportadora_id.eq.${id},cliente_id.eq.${id}`)
       .limit(1);
 
     if (ordensExistentes && ordensExistentes.length > 0) {
@@ -235,24 +235,19 @@ router.delete('/entidades/:id', requireSector('comercial'), async (req, res, nex
 // Listar ordens de coleta
 router.get('/ordens-coleta', requireSector('comercial'), async (req, res, next) => {
   try {
-    const { status, empresa_emissora_id } = req.query;
+    const { status, emissora_id } = req.query;
     
     let query = supabase
       .from('ordens_coleta')
-      .select(`
-        *,
-        empresa_emissora:entidades!empresa_emissora_id(id, razao_social, nome_fantasia, tipo),
-        transportadora:entidades!transportadora_id(id, razao_social, nome_fantasia, tipo),
-        produto:produtos(id, nome, codigo)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (status) {
       query = query.eq('status', status);
     }
 
-    if (empresa_emissora_id) {
-      query = query.eq('empresa_emissora_id', empresa_emissora_id);
+    if (emissora_id) {
+      query = query.eq('emissora_id', emissora_id);
     }
 
     const { data: ordens, error } = await query;
@@ -277,12 +272,7 @@ router.get('/ordens-coleta/:id', requireSector('comercial'), async (req, res, ne
 
     const { data: ordem, error } = await supabase
       .from('ordens_coleta')
-      .select(`
-        *,
-        empresa_emissora:entidades!empresa_emissora_id(*),
-        transportadora:entidades!transportadora_id(*),
-        produto:produtos(*)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
 
@@ -306,20 +296,22 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
     }
 
     const {
-      empresa_emissora_id,
-      produto_id,
-      quantidade,
-      tipo_embalagem,
+      emissora_id,
+      cliente_id,
       transportadora_id,
-      observacoes,
-      prazo_entrega
+      produto,
+      referencia,
+      observacao,
+      quantidade,
+      unidade = 'ton',
+      embalagem
     } = req.body;
 
     // Verificar empresa emissora
     const { data: empresaEmissora } = await supabase
       .from('entidades')
-      .select('id, tipo, empresa_emissora')
-      .eq('id', empresa_emissora_id)
+      .select('id, tipos')
+      .eq('id', emissora_id)
       .single();
 
     if (!empresaEmissora) {
@@ -330,7 +322,7 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
     }
 
     // Aceitar emissora se flag true ou tipo 'emissora'
-    const podeEmitir = empresaEmissora.empresa_emissora === true || empresaEmissora.tipo === 'emissora';
+    const podeEmitir = Array.isArray(empresaEmissora.tipos) && empresaEmissora.tipos.includes('emissora');
     if (!podeEmitir) {
       return res.status(400).json({
         error: 'Empresa selecionada não é uma empresa emissora',
@@ -338,30 +330,15 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
       });
     }
 
-    // Verificar se o produto existe
-    const { data: produto } = await supabase
-      .from('produtos')
-      .select('id')
-      .eq('id', produto_id)
-      .single();
-
-    if (!produto) {
-      return res.status(404).json({
-        error: 'Produto não encontrado',
-        code: 'PRODUTO_NOT_FOUND'
-      });
-    }
-
     // Verificar transportadora se fornecida
     if (transportadora_id) {
       const { data: transportadora } = await supabase
         .from('entidades')
-        .select('id, tipo')
+        .select('id, tipos')
         .eq('id', transportadora_id)
-        .eq('tipo', 'transportadora')
         .single();
 
-      if (!transportadora) {
+      if (!transportadora || !transportadora.tipos?.includes('transportadora')) {
         return res.status(404).json({
           error: 'Transportadora não encontrada',
           code: 'TRANSPORTADORA_NOT_FOUND'
@@ -372,23 +349,19 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
     const { data: novaOrdem, error } = await supabase
       .from('ordens_coleta')
       .insert({
-        empresa_emissora_id,
-        produto_id,
+        emissora_id,
+        cliente_id: cliente_id || null,
+        transportadora_id: transportadora_id || null,
+        produto,
+        referencia: referencia || null,
+        observacao: observacao || null,
         quantidade,
-        tipo_embalagem,
-        transportadora_id,
-        observacoes,
-        prazo_entrega,
-        status: 'aberta',
-        created_by: req.user.id,
+        unidade,
+        embalagem: embalagem || null,
+        status: 'rascunho',
         created_at: new Date().toISOString()
       })
-      .select(`
-        *,
-        empresa_emissora:entidades!empresa_emissora_id(id, razao_social, nome_fantasia),
-        transportadora:entidades!transportadora_id(id, razao_social, nome_fantasia),
-        produto:produtos(id, nome, codigo)
-      `)
+      .select('*')
       .single();
 
     if (error) {
@@ -409,9 +382,9 @@ router.post('/ordens-coleta', ordemColetaValidation, requireSector('comercial'),
 router.patch('/ordens-coleta/:id/status', requireSector('comercial'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status, observacoes } = req.body;
+    const { status, observacao } = req.body;
 
-    const statusValidos = ['aberta', 'em_separacao', 'pronto_coleta', 'aguardando_nf', 'finalizada'];
+    const statusValidos = ['rascunho','em_separacao','pronto','coleta_solicitada','coletado','cancelado'];
     
     if (!statusValidos.includes(status)) {
       return res.status(400).json({
@@ -423,27 +396,17 @@ router.patch('/ordens-coleta/:id/status', requireSector('comercial'), async (req
     const updateData = {
       status,
       updated_at: new Date().toISOString(),
-      updated_by: req.user.id
     };
 
-    if (observacoes) {
-      updateData.observacoes = observacoes;
+    if (observacao) {
+      updateData.observacao = observacao;
     }
-
-    if (status === 'em_separacao') updateData.inicio_separacao = new Date().toISOString();
-    if (status === 'pronto_coleta') updateData.fim_separacao = new Date().toISOString();
-    if (status === 'finalizada') updateData.data_finalizacao = new Date().toISOString();
 
     const { data: ordemAtualizada, error } = await supabase
       .from('ordens_coleta')
       .update(updateData)
       .eq('id', id)
-      .select(`
-        *,
-        empresa_emissora:entidades!empresa_emissora_id(id, razao_social, nome_fantasia),
-        transportadora:entidades!transportadora_id(id, razao_social, nome_fantasia),
-        produto:produtos(id, nome, codigo)
-      `)
+      .select('*')
       .single();
 
     if (error || !ordemAtualizada) {
@@ -503,7 +466,7 @@ router.get('/stats', requireSector('comercial'), async (req, res, next) => {
   try {
     const { data: entidades } = await supabase
       .from('entidades')
-      .select('tipo, empresa_emissora');
+      .select('tipos');
 
     const { data: ordens } = await supabase
       .from('ordens_coleta')
@@ -512,18 +475,19 @@ router.get('/stats', requireSector('comercial'), async (req, res, next) => {
     const stats = {
       entidades: {
         total: entidades?.length || 0,
-        clientes: entidades?.filter(e => e.tipo === 'cliente').length || 0,
-        fornecedores: entidades?.filter(e => e.tipo === 'fornecedor').length || 0,
-        transportadoras: entidades?.filter(e => e.tipo === 'transportadora').length || 0,
-        emissoras: entidades?.filter(e => e.tipo === 'emissora' || e.empresa_emissora).length || 0
+        clientes: entidades?.filter(e => e.tipos?.includes('cliente')).length || 0,
+        fornecedores: entidades?.filter(e => e.tipos?.includes('fornecedor')).length || 0,
+        transportadoras: entidades?.filter(e => e.tipos?.includes('transportadora')).length || 0,
+        emissoras: entidades?.filter(e => e.tipos?.includes('emissora')).length || 0
       },
       ordens_coleta: {
         total: ordens?.length || 0,
-        abertas: ordens?.filter(o => o.status === 'aberta').length || 0,
+        rascunho: ordens?.filter(o => o.status === 'rascunho').length || 0,
         em_separacao: ordens?.filter(o => o.status === 'em_separacao').length || 0,
-        pronto_coleta: ordens?.filter(o => o.status === 'pronto_coleta').length || 0,
-        aguardando_nf: ordens?.filter(o => o.status === 'aguardando_nf').length || 0,
-        finalizadas: ordens?.filter(o => o.status === 'finalizada').length || 0
+        pronto: ordens?.filter(o => o.status === 'pronto').length || 0,
+        coleta_solicitada: ordens?.filter(o => o.status === 'coleta_solicitada').length || 0,
+        coletado: ordens?.filter(o => o.status === 'coletado').length || 0,
+        cancelado: ordens?.filter(o => o.status === 'cancelado').length || 0
       }
     };
 
