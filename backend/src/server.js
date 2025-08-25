@@ -45,12 +45,25 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // CORS
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  process.env.CORS_ORIGIN,
+  'https://tratae-frontend.onrender.com',
+].filter(Boolean);
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser tools
+    if (ALLOWED_ORIGINS.indexOf(origin) !== -1) return callback(null, true);
+    return callback(new Error('CORS not allowed for origin: ' + origin));
+  },
   credentials: true,
-  optionsSuccessStatus: 200
+  allowedHeaders: ['Authorization', 'Content-Type', 'Accept'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  optionsSuccessStatus: 204,
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Parse JSON
 app.use(express.json({ limit: '10mb' }));
