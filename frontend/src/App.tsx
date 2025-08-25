@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
@@ -10,20 +10,37 @@ import { Toaster } from 'react-hot-toast';
 import theme from './assets/theme';
 
 // Material Dashboard 2 React contexts
-import { MaterialUIControllerProvider } from './context';
+import { MaterialUIControllerProvider, AuthContextProvider } from './context';
+
+// Auth store and protected route
+import { useAuthStore } from './stores/authStore';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 function App() {
+  const verifyToken = useAuthStore((s) => s.verifyToken);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  useEffect(() => {
+    verifyToken();
+  }, [verifyToken]);
+
+  const LoginRoute = () => (isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />);
+
   return (
     <MaterialUIControllerProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+          <AuthContextProvider>
+            <Routes>
+              <Route path="/login" element={<LoginRoute />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+              </Route>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </AuthContextProvider>
         </Router>
         <Toaster position="top-right" />
       </ThemeProvider>
