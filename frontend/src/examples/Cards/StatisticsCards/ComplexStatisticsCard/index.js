@@ -25,9 +25,9 @@ import Icon from "@mui/material/Icon";
 import MDBox from "../../../../components-template/MDBox";
 import MDTypography from "../../../../components-template/MDTypography";
 
-function ComplexStatisticsCard({ color, title, count, percentage, icon }) {
+function ComplexStatisticsCard({ color, title, count, percentage, icon, onClick, sx }) {
   return (
-    <Card>
+    <Card onClick={onClick} sx={{ cursor: onClick ? 'pointer' : 'default', ...sx }}>
       <MDBox display="flex" justifyContent="space-between" pt={1} px={2}>
         <MDBox
           variant="gradient"
@@ -110,6 +110,8 @@ ComplexStatisticsCard.propTypes = {
     label: PropTypes.string,
   }),
   icon: PropTypes.node.isRequired,
+  onClick: PropTypes.func,
+  sx: PropTypes.object,
 };
 
 export default ComplexStatisticsCard;
