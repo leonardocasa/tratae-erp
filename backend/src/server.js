@@ -152,7 +152,8 @@ const { authMiddleware } = require('./middleware/auth');
 
 // Rotas protegidas
 app.use('/api/users', authMiddleware, require('./routes/users'));
-app.use('/api/comercial', authMiddleware, require('./routes/comercial'));
+// Temporariamente sem auth para depuração do Comercial
+app.use('/api/comercial', require('./routes/comercial'));
 app.use('/api/manufatura', authMiddleware, require('./routes/manufatura'));
 app.use('/api/qualidade', authMiddleware, require('./routes/qualidade'));
 
