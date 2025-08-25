@@ -23,10 +23,10 @@ import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
-import MDButton from "components/MDButton";
+import MDBox from 'components-template/MDBox';
+import MDTypography from 'components-template/MDTypography';
+import MDAvatar from 'components-template/MDAvatar';
+import MDButton from 'components-template/MDButton';
 
 function ProfilesList({ title, profiles, shadow }) {
   const renderProfiles = profiles.map(({ image, name, description, action }) => (

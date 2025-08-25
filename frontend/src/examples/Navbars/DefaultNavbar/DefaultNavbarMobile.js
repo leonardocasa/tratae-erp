@@ -20,7 +20,7 @@ import PropTypes from "prop-types";
 import Menu from "@mui/material/Menu";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
+import MDBox from 'components-template/MDBox';
 
 // Material Dashboard 2 React example components
 import DefaultNavbarLink from "examples/Navbars/DefaultNavbar/DefaultNavbarLink";

@@ -20,8 +20,8 @@ import PropTypes from "prop-types";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from 'components-template/MDBox';
+import MDTypography from 'components-template/MDTypography';
 
 // Timeline context
 import { useTimeline } from "examples/Timeline/context";

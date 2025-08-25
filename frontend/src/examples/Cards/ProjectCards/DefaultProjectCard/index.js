@@ -25,10 +25,10 @@ import CardMedia from "@mui/material/CardMedia";
 import Tooltip from "@mui/material/Tooltip";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
-import MDAvatar from "components/MDAvatar";
+import MDBox from 'components-template/MDBox';
+import MDTypography from 'components-template/MDTypography';
+import MDButton from 'components-template/MDButton';
+import MDAvatar from 'components-template/MDAvatar';
 
 function DefaultProjectCard({ image, label, title, description, action, authors }) {
   const renderAuthors = authors.map(({ image: media, name }) => (

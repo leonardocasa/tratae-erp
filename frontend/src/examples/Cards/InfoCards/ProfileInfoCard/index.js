@@ -26,8 +26,8 @@ import Tooltip from "@mui/material/Tooltip";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from 'components-template/MDBox';
+import MDTypography from 'components-template/MDTypography';
 
 // Material Dashboard 2 React base styles
 import colors from "assets/theme/base/colors";
