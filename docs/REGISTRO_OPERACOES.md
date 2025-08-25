@@ -51,3 +51,17 @@
 
 ### 🔧 Arquivos Criados
 - `
+
+## 2025-08-25
+
+### ✅ Ponto de Rollback Recomendado
+- **Commit**: 0256759
+- **Título**: fix(frontend): resolve imports (components-template), add baseUrl, and fix quotes; build ok locally
+- **Origem**: Deploy live no Render (frontend)
+- **Data/Hora**: 2025-08-25 07:07 (GMT-3)
+- **Motivo**: Versão estável após correções de imports, baseUrl e quotes; usada como referência de estabilidade para retroceder rapidamente se necessário.
+- **Notas**:
+  - Imports corrigidos para `components-template/*`
+  - `tsconfig.json` atualizado com `baseUrl: "src"`
+  - Padronização de aspas nos `examples/*`
+  - Build local validado e deploy confirmado como Live

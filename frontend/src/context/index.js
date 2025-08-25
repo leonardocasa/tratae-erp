@@ -18,11 +18,12 @@ Coded by www.creative-tim.com
   you can customize the states for the different components here.
 */
 
-import { createContext, useContext, useReducer, useMemo, useState, useEffect } from "react";
+import { createContext, useContext, useReducer, useMemo } from "react";
 
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
 
 // Material Dashboard 2 React main context
 const MaterialUI = createContext();
@@ -36,37 +37,18 @@ export const AuthContext = createContext({
 });
 
 const AuthContextProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    if (!token) return;
-
-    setIsAuthenticated(true);
-    navigate(location.pathname);
-  }, []);
-
-  useEffect(() => {
-    if (!token) return;
-
-    setIsAuthenticated(isAuthenticated);
-    navigate(location.pathname);
-  }, [isAuthenticated]);
-
-  const login = (token) => {
-    localStorage.setItem("token", token);
-    setIsAuthenticated(true);
-    navigate("/dashboard");
-  };
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const storeLogout = useAuthStore((s) => s.logout);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
-    navigate("/auth/login");
+    storeLogout();
+    navigate("/login");
+  };
+
+  const login = () => {
+    // login é tratado via useAuthStore(Login.tsx). Mantido para compatibilidade.
+    navigate("/dashboard");
   };
 
   return (

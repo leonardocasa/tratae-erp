@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, Container, Paper, TextField, Typography } from '@mui/material';
 import { useAuthStore } from '../../stores/authStore';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, isAuthenticated, clearError } = useAuthStore();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -13,11 +15,16 @@ const Login: React.FC = () => {
     setError(null);
     try {
       await login(email, password);
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Falha no login');
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) navigate('/dashboard');
+    return () => clearError();
+  }, [isAuthenticated, navigate, clearError]);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
