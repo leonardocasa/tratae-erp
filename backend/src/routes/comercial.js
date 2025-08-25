@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { supabaseAdmin: supabase } = require('../config/supabase');
+const { getAdminOrUser, hasServiceKey } = require('../config/supabase');
+const supabase = getAdminOrUser();
 const { createValidationError, createNotFoundError, requireSector } = require('../middleware/auth');
 
 const router = express.Router();

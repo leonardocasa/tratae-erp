@@ -56,5 +56,7 @@ module.exports = {
   supabase,
   supabaseAdmin,
   getClient,
-  testConnection
+  testConnection,
+  hasServiceKey: Boolean(supabaseServiceKey),
+  getAdminOrUser: () => (supabaseServiceKey ? supabaseAdmin : supabase),
 };

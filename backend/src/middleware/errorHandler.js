@@ -73,15 +73,16 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // Erro padrão
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || err.status || 500;
   const message = err.message || 'Erro interno do servidor';
 
   res.status(statusCode).json({
     error: message,
     code: err.code || 'INTERNAL_ERROR',
-    ...(process.env.NODE_ENV === 'development' && {
-      stack: err.stack
-    })
+    details: err?.response?.data || err?.details || undefined,
+    path: req.originalUrl,
+    method: req.method,
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };
 
